@@ -1,0 +1,96 @@
+[
+    {
+        "key":  "searchValue",
+        "templateOptions":  {
+                                "label":  "Search AFAS Organisational Unit",
+                                "useDataSource":  false,
+                                "required":  true
+                            },
+        "type":  "input",
+        "summaryVisibility":  "Show",
+        "requiresTemplateOptions":  true,
+        "requiresKey":  true,
+        "requiresDataSource":  false
+    },
+    {
+        "key":  "afasLocations",
+        "templateOptions":  {
+                                "label":  "Organisational Units",
+                                "required":  true,
+                                "grid":  {
+                                             "columns":  [
+                                                             {
+                                                                 "headerName":  "Id",
+                                                                 "field":  "Id"
+                                                             },
+                                                             {
+                                                                 "headerName":  "Display Name",
+                                                                 "field":  "DisplayName"
+                                                             }
+                                                         ],
+                                             "height":  300,
+                                             "rowSelection":  "single"
+                                         },
+                                "dataSourceConfig":  {
+                                                         "dataSourceGuid":  "$dataSourceGuid_0",
+                                                         "input":  {
+                                                                       "propertyInputs":  [
+                                                                                              {
+                                                                                                  "propertyName":  "searchValue",
+                                                                                                  "otherFieldValue":  {
+                                                                                                                          "otherFieldKey":  "searchValue"
+                                                                                                                      }
+                                                                                              }
+                                                                                          ]
+                                                                   }
+                                                     },
+                                "useDefault":  true,
+                                "defaultSelectorProperty":  "DisplayName"
+                            },
+        "type":  "grid",
+        "summaryVisibility":  "Show",
+        "requiresTemplateOptions":  true,
+        "requiresKey":  true,
+        "requiresDataSource":  true
+    },
+    {
+        "key":  "multiselect",
+        "templateOptions":  {
+                                "label":  "Nedap Locations",
+                                "required":  true,
+                                "grid":  {
+                                             "columns":  [
+                                                             {
+                                                                 "headerName":  "Id",
+                                                                 "field":  "Id"
+                                                             },
+                                                             {
+                                                                 "headerName":  "Display Name",
+                                                                 "field":  "DisplayName"
+                                                             }
+                                                         ],
+                                             "height":  300,
+                                             "rowSelection":  "single"
+                                         },
+                                "dataSourceConfig":  {
+                                                         "dataSourceGuid":  "$dataSourceGuid_1",
+                                                         "input":  {
+                                                                       "propertyInputs":  [
+
+                                                                                          ]
+                                                                   }
+                                                     },
+                                "useFilter":  true,
+                                "useDefault":  false,
+                                "valueField":  "Id",
+                                "textField":  "DisplayName",
+                                "useDataSource":  true
+                            },
+        "type":  "multiselect",
+        "summaryVisibility":  "Show",
+        "textOrLabel":  "text",
+        "requiresTemplateOptions":  true,
+        "requiresKey":  true,
+        "requiresDataSource":  false
+    }
+]

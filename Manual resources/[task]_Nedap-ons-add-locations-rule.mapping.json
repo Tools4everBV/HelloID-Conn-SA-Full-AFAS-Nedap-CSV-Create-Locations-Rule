@@ -1,0 +1,10 @@
+[
+    {
+        "name":  "afasLocationId",
+        "value":  "{{form.afasLocations.Id}}"
+    },
+    {
+        "name":  "nedapLocationIds",
+        "value":  "{{form.multiselect.toJsonString}}"
+    }
+]
