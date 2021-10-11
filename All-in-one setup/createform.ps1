@@ -355,10 +355,12 @@ function Get-NedapLocationList {
         $response = Invoke-WebRequest @webRequestSplatting
         $locations = $response.Content | ConvertFrom-Json
         Write-Output  $locations.locations
-    } catch {
+    }
+    catch {
         if ($_.ErrorDetails) {
             $errorReponse = $_.ErrorDetails
-        } elseif ($_.Exception.Response) {
+        }
+        elseif ($_.Exception.Response) {
             $reader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream())
             $errorReponse = $reader.ReadToEnd()
             $reader.Dispose()
@@ -369,12 +371,11 @@ function Get-NedapLocationList {
 Import-NedapCertificate -CertificatePath $script:CertificatePath  -CertificatePassword $script:CertificatePassword
 $locations = Get-NedapLocationList | Select-Object id, name, identificationNo
 
-ForEach($location in $locations)
-        {
-            #Write-Output $Site 
-            $returnObject = @{ Id=$location.id; DisplayName=$location.name; identificatonNo=$location.identificationNo }
-            Write-Output $returnObject                
-        }
+ForEach ($location in $locations) {
+    #Write-Output $Site 
+    $returnObject = @{ Id = $location.id; DisplayName = $location.name; identificatonNo = $location.identificationNo }
+    Write-Output $returnObject                
+}
 '@ 
 $tmpModel = @'
 [{"key":"Id","type":0},{"key":"DisplayName","type":0},{"key":"identificatonNo","type":0}]
@@ -424,13 +425,13 @@ function Get-AFASConnectorData {
 
         foreach ($record in $dataset.rows) { [void]$data.Value.add($record) }
 
-        $skip += 100
-        while ($dataset.rows.count -ne 0) {
+        $skip += $take
+        while (@($dataset.rows).count -eq $take) {
             $uri = $BaseUri + "/connectors/" + $Connector + "?skip=$skip&take=$take"
 
             $dataset = Invoke-RestMethod -Method Get -Uri $uri -Headers $Headers -UseBasicParsing
 
-            $skip += 100
+            $skip += $take
 
             foreach ($record in $dataset.rows) { [void]$data.Value.add($record) }
         }
@@ -443,14 +444,13 @@ function Get-AFASConnectorData {
 
 $organizationalUnits = New-Object System.Collections.ArrayList
 Get-AFASConnectorData -Token $token -BaseUri $baseUri -Connector "T4E_HelloID_OrganizationalUnits" ([ref]$organizationalUnits) 
-$afasLocations = $organizationalUnits | Select-Object ExternalId, DisplayName | Where { $_.DisplayName -like '*medewerkers*' }
+$afasLocations = $organizationalUnits | Select-Object ExternalId, DisplayName | Where-Object { $_.DisplayName -like "*$searchValue*" }
 
-ForEach($afasLocation in $afasLocations)
-        {
-            #Write-Output $Site 
-            $returnObject = @{ Id=$afasLocation.ExternalId; DisplayName=$afasLocation.DisplayName; }
-            Write-Output $returnObject                
-        }
+ForEach ($afasLocation in $afasLocations) {
+    #Write-Output $Site 
+    $returnObject = @{ Id = $afasLocation.ExternalId; DisplayName = $afasLocation.DisplayName; }
+    Write-Output $returnObject                
+}
 '@ 
 $tmpModel = @'
 [{"key":"Id","type":0},{"key":"DisplayName","type":0}]
@@ -534,20 +534,18 @@ $Path = $NedapOnsLocationMappingPath
 $afasLocation = $afasLocationId
 $nedapLocations = $nedapLocationIds | ConvertFrom-Json
 
-foreach($n in $nedapLocations)
-{
+foreach ($n in $nedapLocations) {
     $nedapLocationString = $nedapLocationString + $n.Id.ToString() + ","
 }
 
-$nedapLocationString = $nedapLocationString.Substring(0,$nedapLocationString.Length-1)
+$nedapLocationString = $nedapLocationString.Substring(0, $nedapLocationString.Length - 1)
 
 $rule = [PSCustomObject]@{
     "Department.ExternalId" = $afasLocation;
-    "NedapLocationIds"= $nedapLocationString;
+    "NedapLocationIds"      = $nedapLocationString;
 }
 
-$rule | ConvertTo-Csv -NoTypeInformation -Delimiter ";" | % { $_ -replace '"', ""}  | Select-Object -Skip 1  | Add-Content $Path -Encoding UTF8
-
+$rule | ConvertTo-Csv -NoTypeInformation -Delimiter ";" | ForEach-Object { $_ -replace '"', "" }  | Select-Object -Skip 1  | Add-Content $Path -Encoding UTF8
 '@; 
 
 	$tmpVariables = @'

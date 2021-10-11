@@ -31,13 +31,13 @@ function Get-AFASConnectorData {
 
         foreach ($record in $dataset.rows) { [void]$data.Value.add($record) }
 
-        $skip += 100
-        while ($dataset.rows.count -ne 0) {
+        $skip += $take
+        while (@($dataset.rows).count -eq $take) {
             $uri = $BaseUri + "/connectors/" + $Connector + "?skip=$skip&take=$take"
 
             $dataset = Invoke-RestMethod -Method Get -Uri $uri -Headers $Headers -UseBasicParsing
 
-            $skip += 100
+            $skip += $take
 
             foreach ($record in $dataset.rows) { [void]$data.Value.add($record) }
         }
@@ -50,11 +50,10 @@ function Get-AFASConnectorData {
 
 $organizationalUnits = New-Object System.Collections.ArrayList
 Get-AFASConnectorData -Token $token -BaseUri $baseUri -Connector "T4E_HelloID_OrganizationalUnits" ([ref]$organizationalUnits) 
-$afasLocations = $organizationalUnits | Select-Object ExternalId, DisplayName | Where { $_.DisplayName -like '*medewerkers*' }
+$afasLocations = $organizationalUnits | Select-Object ExternalId, DisplayName | Where-Object { $_.DisplayName -like "*$searchValue*" }
 
-ForEach($afasLocation in $afasLocations)
-        {
-            #Write-Output $Site 
-            $returnObject = @{ Id=$afasLocation.ExternalId; DisplayName=$afasLocation.DisplayName; }
-            Write-Output $returnObject                
-        }
+ForEach ($afasLocation in $afasLocations) {
+    #Write-Output $Site 
+    $returnObject = @{ Id = $afasLocation.ExternalId; DisplayName = $afasLocation.DisplayName; }
+    Write-Output $returnObject                
+}
