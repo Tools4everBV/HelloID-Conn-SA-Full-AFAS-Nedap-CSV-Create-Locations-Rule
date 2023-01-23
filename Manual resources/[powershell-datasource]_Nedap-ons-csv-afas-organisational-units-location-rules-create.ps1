@@ -48,7 +48,7 @@ function Get-AFASConnectorData {
     }
 }
 
-$organizationalUnits = New-Object System.Collections.ArrayList
+$organizationalUnits = [System.Collections.ArrayList]::new()
 Get-AFASConnectorData -Token $token -BaseUri $baseUri -Connector "T4E_HelloID_OrganizationalUnits" ([ref]$organizationalUnits) 
 $afasLocations = $organizationalUnits | Select-Object ExternalId, DisplayName | Where-Object { $_.DisplayName -like "*$searchValue*" }
 
